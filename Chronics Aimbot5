@@ -18,6 +18,7 @@ local fovAngle = 60 -- Field of View angle in degrees
 local visualizerEnabled = false -- Start with visualizer off
 local horizontalOffset = 0 -- Initial horizontal offset
 local verticalOffset = -19 -- Initial vertical offset
+local excludedPlayers = {}
 
 -- FOV Visualizer Setup
 local fovVisualizer = Instance.new("ScreenGui")
@@ -336,5 +337,74 @@ RunService.RenderStepped:Connect(function()
     updateAimbot()
     updateFOVVisualizer() -- Continuously update the visualizer
 end)
+-- Add GUI for excluding players
+local excludeTab = Window:MakeTab({
+    Name = "Exclude Players",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local function updateExcludeList()
+    excludeTab:ClearElements()
+    local players = Players:GetPlayers()
+    for _, otherPlayer in pairs(players) do
+        if otherPlayer ~= player then
+            excludeTab:AddToggle({
+                Name = otherPlayer.Name,
+                Default = excludedPlayers[otherPlayer.UserId] or false,
+                Callback = function(value)
+                    excludedPlayers[otherPlayer.UserId] = value
+                end
+            })
+        end
+    end
+end
+
+updateExcludeList()
+
+Players.PlayerAdded:Connect(updateExcludeList)
+Players.PlayerRemoving:Connect(updateExcludeList)
+
+-- Update getPrioritizedTarget function
+local function getPrioritizedTarget()
+    local nearestPart = nil
+    local closestDistance = math.huge
+    local playerPosition = player.Character and player.Character.PrimaryPart.Position or Vector3.new()
+    local cameraCFrame = Camera.CFrame
+    local cameraLookVector = cameraCFrame.LookVector
+
+    local players = Players:GetPlayers()
+    for _, otherPlayer in pairs(players) do
+        if otherPlayer ~= player and otherPlayer.Character then
+            if excludedPlayers[otherPlayer.UserId] then
+                continue
+            end
+
+            local humanoid = otherPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                for _, partName in ipairs({"Head", "UpperTorso", "LowerTorso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}) do
+                    local part = otherPlayer.Character:FindFirstChild(partName)
+                    if part then
+                        local distance = (part.Position - playerPosition).magnitude
+                        local screenPosition, isOnScreen = Camera:WorldToViewportPoint(part.Position)
+                        if isOnScreen and distance < lockOnRadius then
+                            local partVector = (part.Position - cameraCFrame.Position).unit
+                            local angle = getAngleBetween(cameraLookVector, partVector)
+                            if angle < fovAngle / 2 then
+                                if distance < closestDistance then
+                                    closestDistance = distance
+                                    nearestPart = part
+                                elseif distance == closestDistance and humanoid.Health < (nearestPart.Parent:FindFirstChildOfClass("Humanoid") or {Health = math.huge}).Health then
+                                    nearestPart = part
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return nearestPart
+end
 
 OrionLib:Init()
