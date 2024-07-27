@@ -337,6 +337,7 @@ RunService.RenderStepped:Connect(function()
     updateAimbot()
     updateFOVVisualizer() -- Continuously update the visualizer
 end)
+
 -- Add GUI for excluding players
 local excludeTab = Window:MakeTab({
     Name = "Exclude Players",
@@ -345,10 +346,11 @@ local excludeTab = Window:MakeTab({
 })
 
 local function updateExcludeList()
-    excludeTab:ClearElements()
+    excludeTab:ClearElements() -- Clear old elements
     local players = Players:GetPlayers()
     for _, otherPlayer in pairs(players) do
         if otherPlayer ~= player then
+            -- Add or update the toggle button for each player
             excludeTab:AddToggle({
                 Name = otherPlayer.Name,
                 Default = excludedPlayers[otherPlayer.UserId] or false,
@@ -360,12 +362,23 @@ local function updateExcludeList()
     end
 end
 
+-- Call this function initially and whenever players join or leave
 updateExcludeList()
 
-Players.PlayerAdded:Connect(updateExcludeList)
-Players.PlayerRemoving:Connect(updateExcludeList)
+Players.PlayerAdded:Connect(function()
+    updateExcludeList() -- Refresh the list when a new player joins
+end)
 
--- Update getPrioritizedTarget function
+Players.PlayerRemoving:Connect(function()
+    updateExcludeList() -- Refresh the list when a player leaves
+end)
+
+-- Optionally, use Heartbeat for more frequent updates
+RunService.Heartbeat:Connect(function()
+    updateExcludeList()
+end)
+
+-- Update getPrioritizedTarget function to respect exclusions
 local function getPrioritizedTarget()
     local nearestPart = nil
     local closestDistance = math.huge
@@ -376,6 +389,7 @@ local function getPrioritizedTarget()
     local players = Players:GetPlayers()
     for _, otherPlayer in pairs(players) do
         if otherPlayer ~= player and otherPlayer.Character then
+            -- Skip excluded players
             if excludedPlayers[otherPlayer.UserId] then
                 continue
             end
