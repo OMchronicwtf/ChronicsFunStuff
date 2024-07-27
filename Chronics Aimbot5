@@ -1,6 +1,5 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local Players = game:GetService("Players")
-local Teams = game:GetService("Teams")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -13,19 +12,18 @@ local targetPart = nil
 local lockOnHeld = false
 local aimbotEnabled = false
 local autoLockEnabled = false
-local lockOnKey = Enum.UserInputType.MouseButton2
-local lockOnRadius = 20
-local fovAngle = 60
-local visualizerEnabled = false
-local horizontalOffset = 0
-local verticalOffset = -19
-local teamCheckEnabled = false
-local excludedTeam = nil
+local lockOnKey = Enum.UserInputType.MouseButton2 -- Default keybind for locking on (right mouse button)
+local lockOnRadius = 20 -- Lock-on radius
+local fovAngle = 60 -- Field of View angle in degrees
+local visualizerEnabled = false -- Start with visualizer off
+local horizontalOffset = 0 -- Initial horizontal offset
+local verticalOffset = -19 -- Initial vertical offset
 
+-- FOV Visualizer Setup
 local fovVisualizer = Instance.new("ScreenGui")
 fovVisualizer.Name = "FOVVisualizer"
 fovVisualizer.Parent = player.PlayerGui
-fovVisualizer.Enabled = visualizerEnabled
+fovVisualizer.Enabled = visualizerEnabled -- Control visibility with this property
 
 local fovFrame = Instance.new("Frame")
 fovFrame.Name = "FOVFrame"
@@ -36,7 +34,7 @@ fovFrame.Position = UDim2.new(0.5 + (horizontalOffset / Camera.ViewportSize.X), 
 fovFrame.Parent = fovVisualizer
 
 local fovCorner = Instance.new("UICorner")
-fovCorner.CornerRadius = UDim.new(0.5, 0)
+fovCorner.CornerRadius = UDim.new(0.5, 0) -- Makes the frame circular
 fovCorner.Parent = fovFrame
 
 local function updateFOVVisualizer()
@@ -48,7 +46,9 @@ local function updateFOVVisualizer()
     fovVisualizer.Enabled = true
     local viewportSize = Camera.ViewportSize
     local fovRadius = math.tan(math.rad(fovAngle / 2)) * viewportSize.Magnitude / 2
-    local diameter = math.max(fovRadius * 2 / (viewportSize.Magnitude / 750), 5)
+
+    -- Adjust the scaling factor to make the visualizer size more accurate
+    local diameter = math.max(fovRadius * 2 / (viewportSize.Magnitude / 750), 5) -- Adjusted minimum size
     fovFrame.Size = UDim2.new(0, diameter, 0, diameter)
     fovFrame.Position = UDim2.new(0.5 + (horizontalOffset / Camera.ViewportSize.X), 0, 0.5 + (verticalOffset / Camera.ViewportSize.Y), 0)
 end
@@ -67,10 +67,6 @@ local function getPrioritizedTarget()
     local players = Players:GetPlayers()
     for _, otherPlayer in pairs(players) do
         if otherPlayer ~= player and otherPlayer.Character then
-            if teamCheckEnabled and excludedTeam and otherPlayer.Team and otherPlayer.Team.Name == excludedTeam then
-                continue
-            end
-            
             local humanoid = otherPlayer.Character:FindFirstChildOfClass("Humanoid")
             if humanoid and humanoid.Health > 0 then
                 for _, partName in ipairs({"Head", "UpperTorso", "LowerTorso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}) do
@@ -82,6 +78,7 @@ local function getPrioritizedTarget()
                             local partVector = (part.Position - cameraCFrame.Position).unit
                             local angle = getAngleBetween(cameraLookVector, partVector)
                             if angle < fovAngle / 2 then
+                                -- Prioritize by distance and health
                                 if distance < closestDistance then
                                     closestDistance = distance
                                     nearestPart = part
@@ -111,6 +108,7 @@ local function updateAimbot()
                 lockOnTarget(target)
             end
         end
+        -- Manual lock-on logic
         if lockOnHeld then
             local target = getPrioritizedTarget()
             if target then
@@ -120,6 +118,7 @@ local function updateAimbot()
     end
 end
 
+-- Orion GUI Setup
 local Window = OrionLib:MakeWindow({Name = "Chronic's Aimbot", HidePremium = false, SaveConfig = true, ConfigFolder = "AimbotConfig"})
 
 local aimbotTab = Window:MakeTab({
@@ -142,7 +141,7 @@ aimbotTab:AddBind({
             })
         else
             if autoLockEnabled then
-                autoLockEnabled = false
+                autoLockEnabled = false -- Disable auto-lock if aimbot is turned off
                 OrionLib:MakeNotification({
                     Name = "Aimbot Disabled",
                     Content = "Aimbot is now disabled. Auto-Lock has been disabled.",
@@ -208,7 +207,7 @@ aimbotTab:AddSlider({
     ValueName = "Angle",
     Callback = function(value)
         fovAngle = value
-        updateFOVVisualizer()
+        updateFOVVisualizer() -- Update the visualizer when the FOV angle changes
     end    
 })
 
@@ -223,7 +222,7 @@ visualizerTab:AddToggle({
     Default = visualizerEnabled,
     Callback = function(value)
         visualizerEnabled = value
-        updateFOVVisualizer()
+        updateFOVVisualizer() -- Update the visualizer based on the toggle state
     end    
 })
 
@@ -237,7 +236,7 @@ visualizerTab:AddSlider({
     ValueName = "Offset",
     Callback = function(value)
         horizontalOffset = value
-        updateFOVVisualizer()
+        updateFOVVisualizer() -- Update the visualizer position when the offset changes
     end    
 })
 
@@ -251,50 +250,21 @@ visualizerTab:AddSlider({
     ValueName = "Offset",
     Callback = function(value)
         verticalOffset = value
-        updateFOVVisualizer()
+        updateFOVVisualizer() -- Update the visualizer position when the offset changes
     end    
 })
 
-local teamSettingsTab = Window:MakeTab({
-    Name = "Team Settings",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-teamSettingsTab:AddToggle({
-    Name = "Enable Team Check",
-    Default = teamCheckEnabled,
-    Callback = function(value)
-        teamCheckEnabled = value
-    end    
-})
-
-teamSettingsTab:AddDropdown({
-    Name = "Exclude Team",
-    Options = function()
-        local options = {"None"}
-        for _, team in pairs(Teams:GetTeams()) do
-            table.insert(options, team.Name)
-        end
-        return options
-    end,
-    Default = "None",
-    Callback = function(value)
-        excludedTeam = value == "None" and nil or value
-    end    
-})
-
-local otherTab = Window:MakeTab({
+local OtherTab = Window:MakeTab({
     Name = "Other Settings",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
 
-otherTab:AddButton({
+OtherTab:AddButton({
     Name = "Destroy GUI",
     Callback = function()
         OrionLib:Destroy()
-        fovVisualizer:Destroy()
+        fovVisualizer:Destroy() -- Clean up the visualizer
     end    
 })
 
@@ -312,7 +282,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
             })
         else
             if autoLockEnabled then
-                autoLockEnabled = false
+                autoLockEnabled = false -- Disable auto-lock if aimbot is turned off
                 OrionLib:MakeNotification({
                     Name = "Aimbot Disabled",
                     Content = "Aimbot is now disabled. Auto-Lock has been disabled.",
@@ -364,7 +334,7 @@ end)
 
 RunService.RenderStepped:Connect(function()
     updateAimbot()
-    updateFOVVisualizer()
+    updateFOVVisualizer() -- Continuously update the visualizer
 end)
 
 OrionLib:Init()
