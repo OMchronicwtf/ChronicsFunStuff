@@ -1,6 +1,6 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local Players = game:GetService("Players")
-local Teams = game:GetService("Teams") -- Added Teams service
+local Teams = game:GetService("Teams")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -13,20 +13,19 @@ local targetPart = nil
 local lockOnHeld = false
 local aimbotEnabled = false
 local autoLockEnabled = false
-local lockOnKey = Enum.UserInputType.MouseButton2 -- Default keybind for locking on (right mouse button)
-local lockOnRadius = 20 -- Lock-on radius
-local fovAngle = 60 -- Field of View angle in degrees
-local visualizerEnabled = false -- Start with visualizer off
-local horizontalOffset = 0 -- Initial horizontal offset
-local verticalOffset = -19 -- Initial vertical offset
-local teamCheckEnabled = false -- Start with team checking off
-local excludedTeam = nil -- No team excluded initially
+local lockOnKey = Enum.UserInputType.MouseButton2
+local lockOnRadius = 20
+local fovAngle = 60
+local visualizerEnabled = false
+local horizontalOffset = 0
+local verticalOffset = -19
+local teamCheckEnabled = false
+local excludedTeam = nil
 
--- FOV Visualizer Setup
 local fovVisualizer = Instance.new("ScreenGui")
 fovVisualizer.Name = "FOVVisualizer"
 fovVisualizer.Parent = player.PlayerGui
-fovVisualizer.Enabled = visualizerEnabled -- Control visibility with this property
+fovVisualizer.Enabled = visualizerEnabled
 
 local fovFrame = Instance.new("Frame")
 fovFrame.Name = "FOVFrame"
@@ -37,7 +36,7 @@ fovFrame.Position = UDim2.new(0.5 + (horizontalOffset / Camera.ViewportSize.X), 
 fovFrame.Parent = fovVisualizer
 
 local fovCorner = Instance.new("UICorner")
-fovCorner.CornerRadius = UDim.new(0.5, 0) -- Makes the frame circular
+fovCorner.CornerRadius = UDim.new(0.5, 0)
 fovCorner.Parent = fovFrame
 
 local function updateFOVVisualizer()
@@ -49,9 +48,7 @@ local function updateFOVVisualizer()
     fovVisualizer.Enabled = true
     local viewportSize = Camera.ViewportSize
     local fovRadius = math.tan(math.rad(fovAngle / 2)) * viewportSize.Magnitude / 2
-
-    -- Adjust the scaling factor to make the visualizer size more accurate
-    local diameter = math.max(fovRadius * 2 / (viewportSize.Magnitude / 750), 5) -- Adjusted minimum size
+    local diameter = math.max(fovRadius * 2 / (viewportSize.Magnitude / 750), 5)
     fovFrame.Size = UDim2.new(0, diameter, 0, diameter)
     fovFrame.Position = UDim2.new(0.5 + (horizontalOffset / Camera.ViewportSize.X), 0, 0.5 + (verticalOffset / Camera.ViewportSize.Y), 0)
 end
@@ -85,7 +82,6 @@ local function getPrioritizedTarget()
                             local partVector = (part.Position - cameraCFrame.Position).unit
                             local angle = getAngleBetween(cameraLookVector, partVector)
                             if angle < fovAngle / 2 then
-                                -- Prioritize by distance and health
                                 if distance < closestDistance then
                                     closestDistance = distance
                                     nearestPart = part
@@ -115,7 +111,6 @@ local function updateAimbot()
                 lockOnTarget(target)
             end
         end
-        -- Manual lock-on logic
         if lockOnHeld then
             local target = getPrioritizedTarget()
             if target then
@@ -125,7 +120,6 @@ local function updateAimbot()
     end
 end
 
--- Orion GUI Setup
 local Window = OrionLib:MakeWindow({Name = "Chronic's Aimbot", HidePremium = false, SaveConfig = true, ConfigFolder = "AimbotConfig"})
 
 local aimbotTab = Window:MakeTab({
@@ -148,7 +142,7 @@ aimbotTab:AddBind({
             })
         else
             if autoLockEnabled then
-                autoLockEnabled = false -- Disable auto-lock if aimbot is turned off
+                autoLockEnabled = false
                 OrionLib:MakeNotification({
                     Name = "Aimbot Disabled",
                     Content = "Aimbot is now disabled. Auto-Lock has been disabled.",
@@ -214,7 +208,7 @@ aimbotTab:AddSlider({
     ValueName = "Angle",
     Callback = function(value)
         fovAngle = value
-        updateFOVVisualizer() -- Update the visualizer when the FOV angle changes
+        updateFOVVisualizer()
     end    
 })
 
@@ -229,7 +223,7 @@ visualizerTab:AddToggle({
     Default = visualizerEnabled,
     Callback = function(value)
         visualizerEnabled = value
-        updateFOVVisualizer() -- Update the visualizer based on the toggle state
+        updateFOVVisualizer()
     end    
 })
 
@@ -243,7 +237,7 @@ visualizerTab:AddSlider({
     ValueName = "Offset",
     Callback = function(value)
         horizontalOffset = value
-        updateFOVVisualizer() -- Update the visualizer position when the offset changes
+        updateFOVVisualizer()
     end    
 })
 
@@ -257,7 +251,7 @@ visualizerTab:AddSlider({
     ValueName = "Offset",
     Callback = function(value)
         verticalOffset = value
-        updateFOVVisualizer() -- Update the visualizer position when the offset changes
+        updateFOVVisualizer()
     end    
 })
 
@@ -290,17 +284,17 @@ teamSettingsTab:AddDropdown({
     end    
 })
 
-local OtherTab = Window:MakeTab({
+local otherTab = Window:MakeTab({
     Name = "Other Settings",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
 
-OtherTab:AddButton({
+otherTab:AddButton({
     Name = "Destroy GUI",
     Callback = function()
         OrionLib:Destroy()
-        fovVisualizer:Destroy() -- Clean up the visualizer
+        fovVisualizer:Destroy()
     end    
 })
 
@@ -318,7 +312,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
             })
         else
             if autoLockEnabled then
-                autoLockEnabled = false -- Disable auto-lock if aimbot is turned off
+                autoLockEnabled = false
                 OrionLib:MakeNotification({
                     Name = "Aimbot Disabled",
                     Content = "Aimbot is now disabled. Auto-Lock has been disabled.",
@@ -370,7 +364,7 @@ end)
 
 RunService.RenderStepped:Connect(function()
     updateAimbot()
-    updateFOVVisualizer() -- Continuously update the visualizer
+    updateFOVVisualizer()
 end)
 
 OrionLib:Init()
