@@ -1,5 +1,6 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local Players = game:GetService("Players")
+local Teams = game:GetService("Teams") -- Added Teams service
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -69,7 +70,7 @@ local function getPrioritizedTarget()
     local players = Players:GetPlayers()
     for _, otherPlayer in pairs(players) do
         if otherPlayer ~= player and otherPlayer.Character then
-            if teamCheckEnabled and excludedTeam and otherPlayer.Team == excludedTeam then
+            if teamCheckEnabled and excludedTeam and otherPlayer.Team and otherPlayer.Team.Name == excludedTeam then
                 continue
             end
             
@@ -276,7 +277,13 @@ teamSettingsTab:AddToggle({
 
 teamSettingsTab:AddDropdown({
     Name = "Exclude Team",
-    Options = {"None", "Red", "Blue"}, -- Adjust these options based on your game’s teams
+    Options = function()
+        local options = {"None"}
+        for _, team in pairs(Teams:GetTeams()) do
+            table.insert(options, team.Name)
+        end
+        return options
+    end,
     Default = "None",
     Callback = function(value)
         excludedTeam = value == "None" and nil or value
