@@ -1,1 +1,369 @@
-"local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()\r\nlocal Players = game:GetService(\"Players\")\r\nlocal UserInputService = game:GetService(\"UserInputService\")\r\nlocal RunService = game:GetService(\"RunService\")\r\nlocal TweenService = game:GetService(\"TweenService\")\r\nlocal Camera = game.Workspace.CurrentCamera\r\n\r\nlocal player = Players.LocalPlayer\r\nlocal mouse = player:GetMouse()\r\n\r\nlocal targetPart = nil\r\nlocal lockOnHeld = false\r\nlocal aimbotEnabled = false\r\nlocal autoLockEnabled = false\r\nlocal lockOnKey = Enum.UserInputType.MouseButton2 -- Default keybind for locking on (right mouse button)\r\nlocal lockOnRadius = 20 -- Lock-on radius\r\nlocal fovAngle = 60 -- Field of View angle in degrees\r\nlocal visualizerEnabled = false -- Start with visualizer off\r\nlocal horizontalOffset = 0 -- Initial horizontal offset\r\nlocal verticalOffset = -19 -- Initial vertical offset\r\n\r\n-- FOV Visualizer Setup\r\nlocal fovVisualizer = Instance.new(\"ScreenGui\")\r\nfovVisualizer.Name = \"FOVVisualizer\"\r\nfovVisualizer.Parent = player.PlayerGui\r\nfovVisualizer.Enabled = visualizerEnabled -- Control visibility with this property\r\n\r\nlocal fovFrame = Instance.new(\"Frame\")\r\nfovFrame.Name = \"FOVFrame\"\r\nfovFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)\r\nfovFrame.BackgroundTransparency = 0.5\r\nfovFrame.AnchorPoint = Vector2.new(0.5, 0.5)\r\nfovFrame.Position = UDim2.new(0.5 + (horizontalOffset / Camera.ViewportSize.X), 0, 0.5 + (verticalOffset / Camera.ViewportSize.Y), 0)\r\nfovFrame.Parent = fovVisualizer\r\n\r\nlocal fovCorner = Instance.new(\"UICorner\")\r\nfovCorner.CornerRadius = UDim.new(0.5, 0) -- Makes the frame circular\r\nfovCorner.Parent = fovFrame\r\n\r\nlocal function updateFOVVisualizer()\r\n    if not visualizerEnabled then\r\n        fovVisualizer.Enabled = false\r\n        return\r\n    end\r\n\r\n    fovVisualizer.Enabled = true\r\n    local viewportSize = Camera.ViewportSize\r\n    local fovRadius = math.tan(math.rad(fovAngle / 2)) * viewportSize.Magnitude / 2\r\n\r\n    -- Adjust the scaling factor to make the visualizer size more accurate\r\n    local diameter = math.max(fovRadius * 2 / (viewportSize.Magnitude / 750), 5) -- Adjusted minimum size\r\n    fovFrame.Size = UDim2.new(0, diameter, 0, diameter)\r\n    fovFrame.Position = UDim2.new(0.5 + (horizontalOffset / Camera.ViewportSize.X), 0, 0.5 + (verticalOffset / Camera.ViewportSize.Y), 0)\r\nend\r\n\r\nlocal function getAngleBetween(vector1, vector2)\r\n    return math.acos(math.clamp(vector1:Dot(vector2), -1, 1)) * (180 / math.pi)\r\nend\r\n\r\nlocal function getPrioritizedTarget()\r\n    local nearestPart = nil\r\n    local closestDistance = math.huge\r\n    local playerPosition = player.Character and player.Character.PrimaryPart.Position or Vector3.new()\r\n    local cameraCFrame = Camera.CFrame\r\n    local cameraLookVector = cameraCFrame.LookVector\r\n\r\n    local players = Players:GetPlayers()\r\n    for _, otherPlayer in pairs(players) do\r\n        if otherPlayer ~= player and otherPlayer.Character then\r\n            local humanoid = otherPlayer.Character:FindFirstChildOfClass(\"Humanoid\")\r\n            if humanoid and humanoid.Health > 0 then\r\n                for _, partName in ipairs({\"Head\", \"UpperTorso\", \"LowerTorso\", \"LeftArm\", \"RightArm\", \"LeftLeg\", \"RightLeg\"}) do\r\n                    local part = otherPlayer.Character:FindFirstChild(partName)\r\n                    if part then\r\n                        local distance = (part.Position - playerPosition).magnitude\r\n                        local screenPosition, isOnScreen = Camera:WorldToViewportPoint(part.Position)\r\n                        if isOnScreen and distance \u003C lockOnRadius then\r\n                            local partVector = (part.Position - cameraCFrame.Position).unit\r\n                            local angle = getAngleBetween(cameraLookVector, partVector)\r\n                            if angle \u003C fovAngle / 2 then\r\n                                -- Prioritize by distance and health\r\n                                if distance \u003C closestDistance then\r\n                                    closestDistance = distance\r\n                                    nearestPart = part\r\n                                elseif distance == closestDistance and humanoid.Health \u003C (nearestPart.Parent:FindFirstChildOfClass(\"Humanoid\") or {Health = math.huge}).Health then\r\n                                    nearestPart = part\r\n                                end\r\n                            end\r\n                        end\r\n                    end\r\n                end\r\n            end\r\n        end\r\n    end\r\n    return nearestPart\r\nend\r\n\r\nlocal function lockOnTarget(target)\r\n    local tween = TweenService:Create(Camera, TweenInfo.new(0.1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = CFrame.new(Camera.CFrame.Position, target.Position)})\r\n    tween:Play()\r\nend\r\n\r\nlocal function updateAimbot()\r\n    if aimbotEnabled then\r\n        if autoLockEnabled then\r\n            local target = getPrioritizedTarget()\r\n            if target then\r\n                lockOnTarget(target)\r\n            end\r\n        end\r\n        -- Manual lock-on logic\r\n        if lockOnHeld then\r\n            local target = getPrioritizedTarget()\r\n            if target then\r\n                lockOnTarget(target)\r\n            end\r\n        end\r\n    end\r\nend\r\n\r\n-- Orion GUI Setup\r\nlocal Window = OrionLib:MakeWindow({Name = \"Chronic's Aimbot\", HidePremium = false, SaveConfig = true, ConfigFolder = \"AimbotConfig\"})\r\n\r\nlocal aimbotTab = Window:MakeTab({\r\n    Name = \"Aimbot Settings\",\r\n    Icon = \"rbxassetid://4483345998\",\r\n    PremiumOnly = false\r\n})\r\n\r\naimbotTab:AddBind({\r\n    Name = \"Toggle Aimbot\",\r\n    Hold = false,\r\n    Callback = function()\r\n        aimbotEnabled = not aimbotEnabled\r\n        if aimbotEnabled then\r\n            OrionLib:MakeNotification({\r\n                Name = \"Aimbot Enabled\",\r\n                Content = \"Aimbot is now enabled.\",\r\n                Image = \"rbxassetid://4483345998\",\r\n                Time = 2\r\n            })\r\n        else\r\n            if autoLockEnabled then\r\n                autoLockEnabled = false -- Disable auto-lock if aimbot is turned off\r\n                OrionLib:MakeNotification({\r\n                    Name = \"Aimbot Disabled\",\r\n                    Content = \"Aimbot is now disabled. Auto-Lock has been disabled.\",\r\n                    Image = \"rbxassetid://4483345998\",\r\n                    Time = 2\r\n                })\r\n            else\r\n                OrionLib:MakeNotification({\r\n                    Name = \"Aimbot Disabled\",\r\n                    Content = \"Aimbot is now disabled.\",\r\n                    Image = \"rbxassetid://4483345998\",\r\n                    Time = 2\r\n                })\r\n            end\r\n        end\r\n    end    \r\n})\r\n\r\naimbotTab:AddBind({\r\n    Name = \"Toggle Auto-Lock\",\r\n    Default = autoLockKey,\r\n    Hold = false,\r\n    Callback = function()\r\n        if aimbotEnabled then\r\n            autoLockEnabled = not autoLockEnabled\r\n            OrionLib:MakeNotification({\r\n                Name = \"Auto-Lock Toggled\",\r\n                Content = \"Auto-Lock is now \" .. (autoLockEnabled and \"enabled\" or \"disabled\"),\r\n                Image = \"rbxassetid://4483345998\",\r\n                Time = 2\r\n            })\r\n        else\r\n            OrionLib:MakeNotification({\r\n                Name = \"Aimbot Disabled\",\r\n                Content = \"Please enable aimbot before using auto-lock.\",\r\n                Image = \"rbxassetid://4483345998\",\r\n                Time = 2\r\n            })\r\n        end\r\n    end    \r\n})\r\n\r\naimbotTab:AddSlider({\r\n    Name = \"Lock-on Radius\",\r\n    Min = 10,\r\n    Max = 100,\r\n    Default = lockOnRadius,\r\n    Color = Color3.fromRGB(255, 255, 255),\r\n    Increment = 1,\r\n    ValueName = \"Radius\",\r\n    Callback = function(value)\r\n        lockOnRadius = value\r\n    end    \r\n})\r\n\r\naimbotTab:AddSlider({\r\n    Name = \"FOV Angle\",\r\n    Min = 10,\r\n    Max = 180,\r\n    Default = fovAngle,\r\n    Color = Color3.fromRGB(255, 255, 255),\r\n    Increment = 1,\r\n    ValueName = \"Angle\",\r\n    Callback = function(value)\r\n        fovAngle = value\r\n        updateFOVVisualizer() -- Update the visualizer when the FOV angle changes\r\n    end    \r\n})\r\n\r\nlocal visualizerTab = Window:MakeTab({\r\n    Name = \"Visual Settings\",\r\n    Icon = \"rbxassetid://4483345998\",\r\n    PremiumOnly = false\r\n})\r\n\r\nvisualizerTab:AddToggle({\r\n    Name = \"Toggle FOV Visualizer\",\r\n    Default = visualizerEnabled,\r\n    Callback = function(value)\r\n        visualizerEnabled = value\r\n        updateFOVVisualizer() -- Update the visualizer based on the toggle state\r\n    end    \r\n})\r\n\r\nvisualizerTab:AddSlider({\r\n    Name = \"FOV Visualizer Horizontal Offset\",\r\n    Min = -200,\r\n    Max = 200,\r\n    Default = horizontalOffset,\r\n    Color = Color3.fromRGB(255, 255, 255),\r\n    Increment = 1,\r\n    ValueName = \"Offset\",\r\n    Callback = function(value)\r\n        horizontalOffset = value\r\n        updateFOVVisualizer() -- Update the visualizer position when the offset changes\r\n    end    \r\n})\r\n\r\nvisualizerTab:AddSlider({\r\n    Name = \"FOV Visualizer Vertical Offset\",\r\n    Min = -200,\r\n    Max = 200,\r\n    Default = verticalOffset,\r\n    Color = Color3.fromRGB(255, 255, 255),\r\n    Increment = 1,\r\n    ValueName = \"Offset\",\r\n    Callback = function(value)\r\n        verticalOffset = value\r\n        updateFOVVisualizer() -- Update the visualizer position when the offset changes\r\n    end    \r\n})\r\n\r\nlocal OtherTab = Window:MakeTab({\r\n    Name = \"Other Settings\",\r\n    Icon = \"rbxassetid://4483345998\",\r\n    PremiumOnly = false\r\n})\r\n\r\nOtherTab:AddButton({\r\n    Name = \"Destroy GUI\",\r\n    Callback = function()\r\n        OrionLib:Destroy()\r\n        fovVisualizer:Destroy() -- Clean up the visualizer\r\n    end    \r\n})\r\n\r\nUserInputService.InputBegan:Connect(function(input, gameProcessed)\r\n    if gameProcessed then return end\r\n\r\n    if input.KeyCode == Enum.KeyCode.F then\r\n        aimbotEnabled = not aimbotEnabled\r\n        if aimbotEnabled then\r\n            OrionLib:MakeNotification({\r\n                Name = \"Aimbot Enabled\",\r\n                Content = \"Aimbot is now enabled.\",\r\n                Image = \"rbxassetid://4483345998\",\r\n                Time = 2\r\n            })\r\n        else\r\n            if autoLockEnabled then\r\n                autoLockEnabled = false -- Disable auto-lock if aimbot is turned off\r\n                OrionLib:MakeNotification({\r\n                    Name = \"Aimbot Disabled\",\r\n                    Content = \"Aimbot is now disabled. Auto-Lock has been disabled.\",\r\n                    Image = \"rbxassetid://4483345998\",\r\n                    Time = 2\r\n                })\r\n            else\r\n                OrionLib:MakeNotification({\r\n                    Name = \"Aimbot Disabled\",\r\n                    Content = \"Aimbot is now disabled.\",\r\n                    Image = \"rbxassetid://4483345998\",\r\n                    Time = 2\r\n                })\r\n            end\r\n        end\r\n    end\r\n\r\n    if input.KeyCode == autoLockKey then\r\n        if aimbotEnabled then\r\n            autoLockEnabled = not autoLockEnabled\r\n            OrionLib:MakeNotification({\r\n                Name = \"Auto-Lock Toggled\",\r\n                Content = \"Auto-Lock is now \" .. (autoLockEnabled and \"enabled\" or \"disabled\"),\r\n                Image = \"rbxassetid://4483345998\",\r\n                Time = 2\r\n            })\r\n        else\r\n            OrionLib:MakeNotification({\r\n                Name = \"Aimbot Disabled\",\r\n                Content = \"Please enable aimbot before using auto-lock.\",\r\n                Image = \"rbxassetid://4483345998\",\r\n                Time = 2\r\n            })\r\n        end\r\n    end\r\n\r\n    if input.UserInputType == lockOnKey then\r\n        if aimbotEnabled then\r\n            lockOnHeld = true\r\n        end\r\n    end\r\nend)\r\n\r\nUserInputService.InputEnded:Connect(function(input)\r\n    if input.UserInputType == lockOnKey then\r\n        lockOnHeld = false\r\n    end\r\nend)\r\n\r\nRunService.RenderStepped:Connect(function()\r\n    updateAimbot()\r\n    updateFOVVisualizer() -- Continuously update the visualizer\r\nend)\r\n\r\nOrionLib:Init()\r\n"
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Camera = game.Workspace.CurrentCamera
+
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local targetPart = nil
+local lockOnHeld = false
+local aimbotEnabled = false
+local autoLockEnabled = false
+local lockOnKey = Enum.UserInputType.MouseButton2 -- Default keybind for locking on (right mouse button)
+local lockOnRadius = 20 -- Lock-on radius
+local fovAngle = 60 -- Field of View angle in degrees
+local visualizerEnabled = false -- Start with visualizer off
+local horizontalOffset = 0 -- Initial horizontal offset
+local verticalOffset = -19 -- Initial vertical offset
+local teamCheckEnabled = false -- Start with team checking off
+local excludedTeam = nil -- No team excluded initially
+
+-- FOV Visualizer Setup
+local fovVisualizer = Instance.new("ScreenGui")
+fovVisualizer.Name = "FOVVisualizer"
+fovVisualizer.Parent = player.PlayerGui
+fovVisualizer.Enabled = visualizerEnabled -- Control visibility with this property
+
+local fovFrame = Instance.new("Frame")
+fovFrame.Name = "FOVFrame"
+fovFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+fovFrame.BackgroundTransparency = 0.5
+fovFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+fovFrame.Position = UDim2.new(0.5 + (horizontalOffset / Camera.ViewportSize.X), 0, 0.5 + (verticalOffset / Camera.ViewportSize.Y), 0)
+fovFrame.Parent = fovVisualizer
+
+local fovCorner = Instance.new("UICorner")
+fovCorner.CornerRadius = UDim.new(0.5, 0) -- Makes the frame circular
+fovCorner.Parent = fovFrame
+
+local function updateFOVVisualizer()
+    if not visualizerEnabled then
+        fovVisualizer.Enabled = false
+        return
+    end
+
+    fovVisualizer.Enabled = true
+    local viewportSize = Camera.ViewportSize
+    local fovRadius = math.tan(math.rad(fovAngle / 2)) * viewportSize.Magnitude / 2
+
+    -- Adjust the scaling factor to make the visualizer size more accurate
+    local diameter = math.max(fovRadius * 2 / (viewportSize.Magnitude / 750), 5) -- Adjusted minimum size
+    fovFrame.Size = UDim2.new(0, diameter, 0, diameter)
+    fovFrame.Position = UDim2.new(0.5 + (horizontalOffset / Camera.ViewportSize.X), 0, 0.5 + (verticalOffset / Camera.ViewportSize.Y), 0)
+end
+
+local function getAngleBetween(vector1, vector2)
+    return math.acos(math.clamp(vector1:Dot(vector2), -1, 1)) * (180 / math.pi)
+end
+
+local function getPrioritizedTarget()
+    local nearestPart = nil
+    local closestDistance = math.huge
+    local playerPosition = player.Character and player.Character.PrimaryPart.Position or Vector3.new()
+    local cameraCFrame = Camera.CFrame
+    local cameraLookVector = cameraCFrame.LookVector
+
+    local players = Players:GetPlayers()
+    for _, otherPlayer in pairs(players) do
+        if otherPlayer ~= player and otherPlayer.Character then
+            if teamCheckEnabled and excludedTeam and otherPlayer.Team == excludedTeam then
+                continue
+            end
+            
+            local humanoid = otherPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                for _, partName in ipairs({"Head", "UpperTorso", "LowerTorso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}) do
+                    local part = otherPlayer.Character:FindFirstChild(partName)
+                    if part then
+                        local distance = (part.Position - playerPosition).magnitude
+                        local screenPosition, isOnScreen = Camera:WorldToViewportPoint(part.Position)
+                        if isOnScreen and distance < lockOnRadius then
+                            local partVector = (part.Position - cameraCFrame.Position).unit
+                            local angle = getAngleBetween(cameraLookVector, partVector)
+                            if angle < fovAngle / 2 then
+                                -- Prioritize by distance and health
+                                if distance < closestDistance then
+                                    closestDistance = distance
+                                    nearestPart = part
+                                elseif distance == closestDistance and humanoid.Health < (nearestPart.Parent:FindFirstChildOfClass("Humanoid") or {Health = math.huge}).Health then
+                                    nearestPart = part
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return nearestPart
+end
+
+local function lockOnTarget(target)
+    local tween = TweenService:Create(Camera, TweenInfo.new(0.1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = CFrame.new(Camera.CFrame.Position, target.Position)})
+    tween:Play()
+end
+
+local function updateAimbot()
+    if aimbotEnabled then
+        if autoLockEnabled then
+            local target = getPrioritizedTarget()
+            if target then
+                lockOnTarget(target)
+            end
+        end
+        -- Manual lock-on logic
+        if lockOnHeld then
+            local target = getPrioritizedTarget()
+            if target then
+                lockOnTarget(target)
+            end
+        end
+    end
+end
+
+-- Orion GUI Setup
+local Window = OrionLib:MakeWindow({Name = "Chronic's Aimbot", HidePremium = false, SaveConfig = true, ConfigFolder = "AimbotConfig"})
+
+local aimbotTab = Window:MakeTab({
+    Name = "Aimbot Settings",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+aimbotTab:AddBind({
+    Name = "Toggle Aimbot",
+    Hold = false,
+    Callback = function()
+        aimbotEnabled = not aimbotEnabled
+        if aimbotEnabled then
+            OrionLib:MakeNotification({
+                Name = "Aimbot Enabled",
+                Content = "Aimbot is now enabled.",
+                Image = "rbxassetid://4483345998",
+                Time = 2
+            })
+        else
+            if autoLockEnabled then
+                autoLockEnabled = false -- Disable auto-lock if aimbot is turned off
+                OrionLib:MakeNotification({
+                    Name = "Aimbot Disabled",
+                    Content = "Aimbot is now disabled. Auto-Lock has been disabled.",
+                    Image = "rbxassetid://4483345998",
+                    Time = 2
+                })
+            else
+                OrionLib:MakeNotification({
+                    Name = "Aimbot Disabled",
+                    Content = "Aimbot is now disabled.",
+                    Image = "rbxassetid://4483345998",
+                    Time = 2
+                })
+            end
+        end
+    end    
+})
+
+aimbotTab:AddBind({
+    Name = "Toggle Auto-Lock",
+    Default = autoLockKey,
+    Hold = false,
+    Callback = function()
+        if aimbotEnabled then
+            autoLockEnabled = not autoLockEnabled
+            OrionLib:MakeNotification({
+                Name = "Auto-Lock Toggled",
+                Content = "Auto-Lock is now " .. (autoLockEnabled and "enabled" or "disabled"),
+                Image = "rbxassetid://4483345998",
+                Time = 2
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Aimbot Disabled",
+                Content = "Please enable aimbot before using auto-lock.",
+                Image = "rbxassetid://4483345998",
+                Time = 2
+            })
+        end
+    end    
+})
+
+aimbotTab:AddSlider({
+    Name = "Lock-on Radius",
+    Min = 10,
+    Max = 100,
+    Default = lockOnRadius,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    ValueName = "Radius",
+    Callback = function(value)
+        lockOnRadius = value
+    end    
+})
+
+aimbotTab:AddSlider({
+    Name = "FOV Angle",
+    Min = 10,
+    Max = 180,
+    Default = fovAngle,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    ValueName = "Angle",
+    Callback = function(value)
+        fovAngle = value
+        updateFOVVisualizer() -- Update the visualizer when the FOV angle changes
+    end    
+})
+
+local visualizerTab = Window:MakeTab({
+    Name = "Visual Settings",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+visualizerTab:AddToggle({
+    Name = "Toggle FOV Visualizer",
+    Default = visualizerEnabled,
+    Callback = function(value)
+        visualizerEnabled = value
+        updateFOVVisualizer() -- Update the visualizer based on the toggle state
+    end    
+})
+
+visualizerTab:AddSlider({
+    Name = "FOV Visualizer Horizontal Offset",
+    Min = -200,
+    Max = 200,
+    Default = horizontalOffset,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    ValueName = "Offset",
+    Callback = function(value)
+        horizontalOffset = value
+        updateFOVVisualizer() -- Update the visualizer position when the offset changes
+    end    
+})
+
+visualizerTab:AddSlider({
+    Name = "FOV Visualizer Vertical Offset",
+    Min = -200,
+    Max = 200,
+    Default = verticalOffset,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    ValueName = "Offset",
+    Callback = function(value)
+        verticalOffset = value
+        updateFOVVisualizer() -- Update the visualizer position when the offset changes
+    end    
+})
+
+local teamSettingsTab = Window:MakeTab({
+    Name = "Team Settings",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+teamSettingsTab:AddToggle({
+    Name = "Enable Team Check",
+    Default = teamCheckEnabled,
+    Callback = function(value)
+        teamCheckEnabled = value
+    end    
+})
+
+teamSettingsTab:AddDropdown({
+    Name = "Exclude Team",
+    Options = {"None", "Red", "Blue"}, -- Adjust these options based on your game’s teams
+    Default = "None",
+    Callback = function(value)
+        excludedTeam = value == "None" and nil or value
+    end    
+})
+
+local OtherTab = Window:MakeTab({
+    Name = "Other Settings",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+OtherTab:AddButton({
+    Name = "Destroy GUI",
+    Callback = function()
+        OrionLib:Destroy()
+        fovVisualizer:Destroy() -- Clean up the visualizer
+    end    
+})
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+
+    if input.KeyCode == Enum.KeyCode.F then
+        aimbotEnabled = not aimbotEnabled
+        if aimbotEnabled then
+            OrionLib:MakeNotification({
+                Name = "Aimbot Enabled",
+                Content = "Aimbot is now enabled.",
+                Image = "rbxassetid://4483345998",
+                Time = 2
+            })
+        else
+            if autoLockEnabled then
+                autoLockEnabled = false -- Disable auto-lock if aimbot is turned off
+                OrionLib:MakeNotification({
+                    Name = "Aimbot Disabled",
+                    Content = "Aimbot is now disabled. Auto-Lock has been disabled.",
+                    Image = "rbxassetid://4483345998",
+                    Time = 2
+                })
+            else
+                OrionLib:MakeNotification({
+                    Name = "Aimbot Disabled",
+                    Content = "Aimbot is now disabled.",
+                    Image = "rbxassetid://4483345998",
+                    Time = 2
+                })
+            end
+        end
+    end
+
+    if input.KeyCode == autoLockKey then
+        if aimbotEnabled then
+            autoLockEnabled = not autoLockEnabled
+            OrionLib:MakeNotification({
+                Name = "Auto-Lock Toggled",
+                Content = "Auto-Lock is now " .. (autoLockEnabled and "enabled" or "disabled"),
+                Image = "rbxassetid://4483345998",
+                Time = 2
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Aimbot Disabled",
+                Content = "Please enable aimbot before using auto-lock.",
+                Image = "rbxassetid://4483345998",
+                Time = 2
+            })
+        end
+    end
+
+    if input.UserInputType == lockOnKey then
+        if aimbotEnabled then
+            lockOnHeld = true
+        end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == lockOnKey then
+        lockOnHeld = false
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    updateAimbot()
+    updateFOVVisualizer() -- Continuously update the visualizer
+end)
+
+OrionLib:Init()
