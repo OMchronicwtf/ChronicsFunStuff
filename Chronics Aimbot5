@@ -119,7 +119,7 @@ local function updateAimbot()
 end
 
 -- Orion GUI Setup
-local Window = OrionLib:MakeWindow({Name = "Chronic's Aimbot", HidePremium = false, SaveConfig = true, ConfigFolder = "AimbotConfig"})
+local Window = OrionLib:MakeWindow({Name = "Chronic's Buggy ahh Aimbot", HidePremium = false, SaveConfig = true, ConfigFolder = "AimbotConfig"})
 
 local aimbotTab = Window:MakeTab({
     Name = "Aimbot Settings",
@@ -187,7 +187,7 @@ aimbotTab:AddBind({
 aimbotTab:AddSlider({
     Name = "Lock-on Radius",
     Min = 10,
-    Max = 250,
+    Max = 500,
     Default = lockOnRadius,
     Color = Color3.fromRGB(255, 255, 255),
     Increment = 1,
