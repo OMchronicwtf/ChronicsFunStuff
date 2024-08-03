@@ -118,8 +118,42 @@ local function updateAimbot()
     end
 end
 
+-- ESP Script
+local esp = false
+
+local function createESPBox(part)
+    local box = Instance.new("BoxHandleAdornment")
+    box.Size = part.Size + Vector3.new(0.1, 0.1, 0.1)
+    box.Adornee = part
+    box.Color3 = Color3.new(1, 0, 0)
+    box.Transparency = 0.5
+    box.ZIndex = 1
+    box.AlwaysOnTop = true
+    box.Parent = part
+end
+
+local function enableESP()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("Model") and v:FindFirstChild("Humanoid") then
+            for _, p in pairs(v:GetChildren()) do
+                if p:IsA("BasePart") then
+                    createESPBox(p)
+                end
+            end
+        end
+    end
+end
+
+local function disableESP()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BoxHandleAdornment") then
+            v:Destroy()
+        end
+    end
+end
+
 -- Orion GUI Setup
-local Window = OrionLib:MakeWindow({Name = "Chronic's Buggy ahh Aimbot", HidePremium = false, SaveConfig = true, ConfigFolder = "AimbotConfig"})
+local Window = OrionLib:MakeWindow({Name = "Chronic's Aimbot", HidePremium = false, SaveConfig = true, ConfigFolder = "AimbotConfig"})
 
 local aimbotTab = Window:MakeTab({
     Name = "Aimbot Settings",
@@ -252,6 +286,30 @@ visualizerTab:AddSlider({
         verticalOffset = value
         updateFOVVisualizer() -- Update the visualizer position when the offset changes
     end    
+})
+
+visualizerTab:AddButton({
+    Name = "Toggle ESP",
+    Callback = function()
+        esp = not esp
+        if esp then
+            enableESP()
+            OrionLib:MakeNotification({
+                Name = "ESP Enabled",
+                Content = "ESP is now enabled.",
+                Image = "rbxassetid://4483345998",
+                Time = 2
+            })
+        else
+            disableESP()
+            OrionLib:MakeNotification({
+                Name = "ESP Disabled",
+                Content = "ESP is now disabled.",
+                Image = "rbxassetid://4483345998",
+                Time = 2
+            })
+        end
+    end
 })
 
 local OtherTab = Window:MakeTab({
