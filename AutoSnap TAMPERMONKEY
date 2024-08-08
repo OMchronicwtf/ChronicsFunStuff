@@ -1,0 +1,214 @@
+// ==UserScript==
+// @name         AutoSnap
+// @namespace    http://yourdomain.net/
+// @version      1.2
+// @description  Adds a lightning button next to the camera button which enables you to automatically send snaps to your desired user
+// @author       OMchronic
+// @match        https://web.snapchat.com/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+  'use strict';
+
+  let processActive = false;
+  let processIntervalId;
+  let clickCheckIntervalId;
+  let waitingForButton = false;
+
+  // Function to add the custom lightning button
+  function addLightningButton() {
+    // Check if button already exists
+    if (document.querySelector('.omchronic-lightning-button')) {
+      return;
+    }
+
+    // Create a new style element for CSS variables and styles
+    const style = document.createElement('style');
+    style.textContent = `
+      :root {
+        --sigButtonSecondary: #0fadff; /* Example color for the button background */
+        --sigButtonOnSecondary: #fff;  /* Example color for the button text */
+        --sigObjectDown: rgba(0,0,0,.1); /* Border color for .EQJi_ */
+        --sigObject: #fff; /* Background color for .EQJi_ */
+        --button-size: 36px;
+        --button-border-radius: 100px;
+        --button-padding: 4px;
+        --button-margin-end: 10px;
+      }
+      .omchronic-lightning-button {
+        background-color: var(--sigButtonSecondary);
+        color: var(--sigButtonOnSecondary);
+        border: .5px solid var(--sigObjectDown);
+        min-height: var(--button-size);
+        min-width: var(--button-size);
+        border-radius: var(--button-border-radius);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--button-padding);
+        margin-inline-end: var(--button-margin-end);
+        cursor: pointer;
+        outline: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      .omchronic-lightning-button:hover {
+        background-color: #0098e3; /* Darker shade for hover effect */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      }
+      .omchronic-lightning-button:active {
+        background-color: #007bb5; /* Even darker shade when button is pressed */
+      }
+      .omchronic-lightning-button svg {
+        width: 24px;
+        height: 24px;
+        fill: var(--sigButtonOnSecondary);
+      }
+      .bCZDc, .eKaL7 {
+        background-color: var(--sigButtonSecondary);
+        color: var(--sigButtonOnSecondary);
+        border: .5px solid var(--sigObjectDown);
+        min-height: var(--button-size);
+        min-width: var(--button-size);
+        border-radius: var(--button-border-radius);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .EQJi_ {
+        border: .5px solid var(--sigObjectDown);
+        background: var(--sigObject);
+      }
+      .cDumY {
+        display: flex;
+        border-radius: 100%;
+        padding: 4px;
+        margin-inline-end: var(--button-margin-end);
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Create a new button element
+    const customButton = document.createElement('button');
+    customButton.className = 'omchronic-lightning-button'; // Apply unique class for identification
+    customButton.type = 'button';
+
+    // Create an SVG element for the custom icon
+    const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svgIcon.setAttribute('viewBox', '0 0 24 24');
+    svgIcon.setAttribute('fill', 'none');
+    svgIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    // Create a path element with a lightning bolt icon path
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M13 2L3 14h8v8l10-12h-8V2z'); // Lightning bolt path
+    path.setAttribute('fill', '#fff');
+
+    // Append the path to the SVG
+    svgIcon.appendChild(path);
+
+    // Append the SVG to the button
+    customButton.appendChild(svgIcon);
+
+    // Insert the button into the DOM (for example, at the beginning of the .jh13h container)
+    const container = document.querySelector('.jh13h');
+    if (container) {
+      container.insertBefore(customButton, container.querySelector('button'));
+    }
+
+    // Add click event listener to toggle the auto-clicking process
+    customButton.addEventListener('click', () => {
+      if (processActive) {
+        stopProcess();
+      } else {
+        startProcess();
+      }
+    });
+  }
+
+  // Continuously check and add the button if it is not present
+  const observer = new MutationObserver(() => {
+    addLightningButton();
+  });
+
+  // Start observing the document body for changes
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Initially add the button
+  addLightningButton();
+
+  // Function to start the process
+  function startProcess() {
+    processActive = true;
+    waitingForButton = false;
+    console.log('Auto-clicking started');
+    processIntervalId = setInterval(() => {
+      if (processActive) {
+        // Click the first button if not waiting for the second button
+        if (!waitingForButton) {
+          clickElementByClass('cDumY.EQJi_.eKaL7.Bnaur');
+          waitingForButton = true; // Start waiting for the second button
+        }
+      }
+    }, 5000); // Adjust the interval as needed (e.g., every 5 seconds)
+  }
+
+  // Function to stop the process
+  function stopProcess() {
+    processActive = false;
+    console.log('Auto-clicking stopped');
+    clearInterval(processIntervalId); // Clear the process loop interval
+    clearInterval(clickCheckIntervalId); // Clear the click check interval
+  }
+
+  // Function to click an element by its class name
+  function clickElementByClass(className) {
+    if (processActive) {
+      const element = document.querySelector(`.${className}`);
+      if (element) {
+        setTimeout(() => {
+          element.click();
+          console.log(`Clicked element with class: ${className}`);
+          if (className.includes('cDumY')) {
+            // After clicking the first button, look for the second button
+            clickWhenFound('FBYjn.gK0xL.A7Cr_.m3ODJ', () => {
+              // After clicking the second button, look for the third button
+              clickWhenFound('TYX6O.eKaL7.Bnaur');
+            });
+          }
+        }, 250); // 0.25-second delay
+      } else {
+        console.log(`Element with class: ${className} not found.`);
+      }
+    }
+  }
+
+  // Function to continuously check for an element and click it once found
+  function clickWhenFound(className, callback, interval = 1000) {
+    if (clickCheckIntervalId) clearInterval(clickCheckIntervalId); // Clear any existing interval
+    clickCheckIntervalId = setInterval(() => {
+      if (processActive) {
+        const element = document.querySelector(`.${className}`);
+        if (element) {
+          setTimeout(() => {
+            element.click();
+            console.log(`Clicked element with class: ${className}`);
+            clearInterval(clickCheckIntervalId); // Stop checking once the element is clicked
+            if (callback) {
+              callback();
+            }
+            if (className === 'TYX6O.eKaL7.Bnaur') {
+              waitingForButton = false; // Reset waiting state
+            }
+          }, 250); // 0.25-second delay
+        } else {
+          console.log(`Waiting for element with class: ${className} to appear...`);
+        }
+      } else {
+        clearInterval(clickCheckIntervalId); // Clear interval if process is stopped
+      }
+    }, interval);
+  }
+
+})();
