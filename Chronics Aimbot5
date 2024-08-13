@@ -376,6 +376,8 @@ espTab:AddColorpicker({
     end
 })
 
+espTab:AddLabel("ESP may cause lag... ")
+
 -- Destroy GUI Tab
 local destroyTab = Window:MakeTab({
     Name = "Destroy GUI",
