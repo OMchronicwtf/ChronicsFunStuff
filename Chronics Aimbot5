@@ -186,7 +186,9 @@ local homeTab = Window:MakeTab({
 
 homeTab:AddLabel("Changelogs")
 
-homeTab:AddParagraph("Recent Changes", "Version 1.1:\n- Excluded the player's own character from ESP.\n- Enhanced ESP updates so all newly joined players will be tracked.")
+homeTab:AddParagraph("Recent Changes", "Version 1.2:\n- Increased Lock-On Radius to 500 studs.")
+
+homeTab:AddParagraph("Version 1.1", "- Excluded the player's own character from ESP.\n- Enhanced ESP updates so all newly joined players will be tracked.")
 
 homeTab:AddParagraph("Version 1.0", "- Aimbot feature with toggle and auto-lock.\n- Adjustable lock-on radius.\n- Configurable FOV angle.\n- Visualizer to show the FOV area on the screen.\n- ESP to highlight players with customizable colors.\n- Options to adjust visualizer offsets and toggle features.\n- Save configurations between sessions.")
 
@@ -262,7 +264,7 @@ aimbotTab:AddBind({
 aimbotTab:AddSlider({
     Name = "Lock-On Radius",
     Min = 5,
-    Max = 100,
+    Max = 500,
     Default = lockOnRadius,
     Color = Color3.fromRGB(255, 0, 0),
     Increment = 1,
