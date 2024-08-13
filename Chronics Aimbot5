@@ -171,7 +171,7 @@ end
 
 -- Orion GUI Setup with Configs
 local Window = OrionLib:MakeWindow({
-    Name = "Chronic's Aimbot",
+    Name = "Chronic's Simple Aimbot",
     HidePremium = false,
     SaveConfig = true,    -- Enables saving configuration
     ConfigFolder = "AimbotConfig" -- Folder name for saving configs
