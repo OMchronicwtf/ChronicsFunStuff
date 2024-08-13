@@ -186,7 +186,7 @@ local homeTab = Window:MakeTab({
 
 homeTab:AddLabel("Changelogs")
 
-homeTab:AddParagraph("Recent Changes", "Version 1.1:\n- Added functionality to exclude the player's own character from the ESP display.\n- Updated the ESP script to ensure it doesn't interfere with the player's view.")
+homeTab:AddParagraph("Recent Changes", "Version 1.1:\n- Excluded the player's own character from the ESP .\n- Enhanced ESP updates so all newly joined players will be tracked.")
 
 homeTab:AddParagraph("Version 1.0", "- Aimbot feature with toggle and auto-lock.\n- Adjustable lock-on radius.\n- Configurable FOV angle.\n- Visualizer to show the FOV area on the screen.\n- ESP to highlight players with customizable colors.\n- Options to adjust visualizer offsets and toggle features.\n- Save configurations between sessions.")
 
