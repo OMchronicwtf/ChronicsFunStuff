@@ -19,7 +19,7 @@ local fovAngle = 60 -- Field of View angle in degrees
 local visualizerEnabled = false -- Start with visualizer off
 local horizontalOffset = 0 -- Initial horizontal offset
 local verticalOffset = -19 -- Initial vertical offset
-local esp = false
+local espEnabled = false
 local espColor = Color3.fromRGB(255, 0, 0) -- Default ESP color
 
 -- FOV Visualizer Setup
@@ -120,54 +120,77 @@ local function updateAimbot()
 end
 
 -- ESP Script
-local function createESPBox(part)
-    if not part:FindFirstChild("ESPBox") then
-        local box = Instance.new("BoxHandleAdornment")
-        box.Name = "ESPBox"
-        box.Size = part.Size + Vector3.new(0.1, 0.1, 0.1)
-        box.Adornee = part
-        box.Color3 = espColor
-        box.Transparency = 0.5
-        box.ZIndex = 1
-        box.AlwaysOnTop = true
-        box.Parent = part
-    end
+local function createESPForPlayer(player)
+    if not player.Character or not player.Character:FindFirstChild("Head") then return end
+    
+    local highlight = Instance.new("Highlight")
+    highlight.Adornee = player.Character
+    highlight.Parent = player.Character
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.FillColor = espColor
+    highlight.FillTransparency = 0.5
+    highlight.OutlineColor = Color3.fromRGB(255, 0, 0) -- Red color
+    highlight.OutlineTransparency = 0
 end
 
 local function updateESP()
-    -- Remove existing ESP
+    if not espEnabled then
+        -- Remove all ESP highlights
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("Highlight") then
+                v:Destroy()
+            end
+        end
+        return
+    end
+    
+    -- Apply ESP to all players
+    for _, player in pairs(Players:GetPlayers()) do
+        if player.Character and player.Character:FindFirstChild("Head") then
+            createESPForPlayer(player)
+        end
+    end
+end
+
+-- Remove ESP highlight when player dies
+local function onCharacterRemoving(character)
     for _, v in pairs(Workspace:GetDescendants()) do
-        if v:IsA("BoxHandleAdornment") and v.Name == "ESPBox" then
+        if v:IsA("Highlight") and v.Adornee and v.Adornee.Parent == character then
             v:Destroy()
         end
     end
+end
 
-    -- Apply ESP only to the head part of other players
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= Players.LocalPlayer and player.Character then
-            local head = player.Character:FindFirstChild("Head")
-            if head then
-                createESPBox(head)
-            end
+-- Handle new players joining
+local function onPlayerAdded(player)
+    if espEnabled then
+        if player.Character then
+            createESPForPlayer(player)
         end
+        player.CharacterAdded:Connect(function(character)
+            createESPForPlayer(player)
+        end)
+        player.CharacterRemoving:Connect(onCharacterRemoving)
     end
 end
 
--- Monitor new player characters and apply ESP
-Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(character)
-        if esp then
-            updateESP()
-        end
-    end)
+-- Listen for player added/removed events
+Players.PlayerAdded:Connect(onPlayerAdded)
+
+Players.PlayerRemoving:Connect(function(player)
+    onCharacterRemoving(player.Character)
 end)
 
--- Monitor existing player characters
-for _, player in pairs(Players:GetPlayers()) do
-    if player.Character then
-        updateESP()
-    end
+local function toggleESP()
+    espEnabled = not espEnabled
+    updateESP()
 end
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not processed and input.KeyCode == espToggleKey then
+        toggleESP()
+    end
+end)
 
 -- Orion GUI Setup with Configs
 local Window = OrionLib:MakeWindow({
@@ -201,7 +224,7 @@ local aimbotTab = Window:MakeTab({
 
 aimbotTab:AddBind({
     Name = "Toggle Aimbot",
-    Default = Enum.KeyCode.F,  -- Default key for toggling aimbot
+    Default = Enum.KeyCode.Q,  -- Default key for toggling aimbot
     Hold = false,             -- The bind works on key press, not holding
     Flag = "aimbotToggle",
     Save = true,
@@ -215,22 +238,12 @@ aimbotTab:AddBind({
                 Time = 2
             })
         else
-            if autoLockEnabled then
-                autoLockEnabled = false -- Disable auto-lock if aimbot is turned off
-                OrionLib:MakeNotification({
-                    Name = "Aimbot Disabled",
-                    Content = "Aimbot is now disabled. Auto-Lock has been disabled.",
-                    Image = "rbxassetid://4483345998",
-                    Time = 2
-                })
-            else
-                OrionLib:MakeNotification({
-                    Name = "Aimbot Disabled",
-                    Content = "Aimbot is now disabled.",
-                    Image = "rbxassetid://4483345998",
-                    Time = 2
-                })
-            end
+            OrionLib:MakeNotification({
+                Name = "Aimbot Disabled",
+                Content = "Aimbot is now disabled.",
+                Image = "rbxassetid://4483345998",
+                Time = 2
+            })
         end
     end    
 })
@@ -347,21 +360,12 @@ local espTab = Window:MakeTab({
 
 espTab:AddToggle({
     Name = "Enable ESP",
-    Default = esp,
+    Default = espEnabled,
     Flag = "espToggle",
     Save = true,
     Callback = function(value)
-        esp = value
-        if esp then
-            updateESP() -- Update ESP when enabled
-        else
-            -- Remove all ESP boxes if disabled
-            for _, v in pairs(Workspace:GetDescendants()) do
-                if v:IsA("BoxHandleAdornment") and v.Name == "ESPBox" then
-                    v:Destroy()
-                end
-            end
-        end
+        espEnabled = value
+        updateESP()
     end
 })
 
@@ -372,13 +376,11 @@ espTab:AddColorpicker({
     Save = true,
     Callback = function(value)
         espColor = value
-        if esp then
-            updateESP() -- Update ESP color if ESP was already enabled
-        end
+        updateESP()
     end
 })
 
-espTab:AddLabel("This may cause lag... Fix coming soon...")
+espTab:AddLabel("Improvements coming soon...")
 
 -- Destroy GUI Tab
 local destroyTab = Window:MakeTab({
@@ -398,12 +400,8 @@ destroyTab:AddButton({
             fovVisualizer:Destroy()
         end
 
-        -- Remove all ESP boxes if ESP is disabled
-        for _, v in pairs(Workspace:GetDescendants()) do
-            if v:IsA("BoxHandleAdornment") and v.Name == "ESPBox" then
-                v:Destroy()
-            end
-        end
+        -- Remove all ESP highlights if ESP is disabled
+        updateESP()
 
         OrionLib:MakeNotification({
             Name = "GUI Destroyed",
@@ -418,9 +416,6 @@ destroyTab:AddButton({
 RunService.RenderStepped:Connect(function()
     updateAimbot()
     updateFOVVisualizer()
-    if esp then
-        updateESP() -- Constantly update ESP
-    end
 end)
 
 -- Manual lock-on input handling
