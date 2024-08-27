@@ -7,7 +7,7 @@
  Y888P  ~Y8888P' Y888888P      888888D      Y88888P ~Y8888P' YP   YP  CONVERTER 
 ]=]
 
--- Instances: 25 | Scripts: 6 | Modules: 0
+-- Instances: 28 | Scripts: 8 | Modules: 0
 local G2L = {};
 
 -- StarterGui.ScreenGui
@@ -19,8 +19,8 @@ G2L["2"] = Instance.new("Frame", G2L["1"]);
 G2L["2"]["Active"] = true;
 G2L["2"]["BorderSizePixel"] = 0;
 G2L["2"]["BackgroundColor3"] = Color3.fromRGB(55, 55, 55);
-G2L["2"]["Size"] = UDim2.new(0, 600, 0, 85);
-G2L["2"]["Position"] = UDim2.new(0.2631, 0, 0.02118, 0);
+G2L["2"]["Size"] = UDim2.new(0, 220, 0, 210);
+G2L["2"]["Position"] = UDim2.new(0.01995, 0, 0.31244, 0);
 G2L["2"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 
 -- StarterGui.ScreenGui.Frame.UICorner
@@ -29,6 +29,7 @@ G2L["3"] = Instance.new("UICorner", G2L["2"]);
 
 -- StarterGui.ScreenGui.Frame.UIStroke
 G2L["4"] = Instance.new("UIStroke", G2L["2"]);
+G2L["4"]["Thickness"] = 2.5;
 G2L["4"]["Color"] = Color3.fromRGB(255, 255, 255);
 
 -- StarterGui.ScreenGui.Frame.label
@@ -40,9 +41,9 @@ G2L["5"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]]
 G2L["5"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["5"]["Size"] = UDim2.new(0, 200, 0, 16);
 G2L["5"]["BorderColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["5"]["Text"] = [[Chronic's Simple Admin V0.1]];
+G2L["5"]["Text"] = [[Chronic's Simple Admin V0.2]];
 G2L["5"]["Name"] = [[label]];
-G2L["5"]["Position"] = UDim2.new(0.33107, 0, 0.75432, 0);
+G2L["5"]["Position"] = UDim2.new(0.07983, 0, 0.87037, 0);
 
 -- StarterGui.ScreenGui.Frame.label.UIStroke
 G2L["6"] = Instance.new("UIStroke", G2L["5"]);
@@ -53,56 +54,59 @@ G2L["6"]["Color"] = Color3.fromRGB(255, 255, 255);
 G2L["7"] = Instance.new("UICorner", G2L["5"]);
 
 
--- StarterGui.ScreenGui.Frame.drag
-G2L["8"] = Instance.new("LocalScript", G2L["2"]);
-G2L["8"]["Name"] = [[drag]];
+-- StarterGui.ScreenGui.Frame.ESPButton
+G2L["8"] = Instance.new("TextButton", G2L["2"]);
+G2L["8"]["BorderSizePixel"] = 0;
+G2L["8"]["TextSize"] = 14;
+G2L["8"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+G2L["8"]["BackgroundColor3"] = Color3.fromRGB(55, 55, 55);
+G2L["8"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+G2L["8"]["Size"] = UDim2.new(0, 175, 0, 50);
+G2L["8"]["Name"] = [[ESPButton]];
+G2L["8"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["8"]["Text"] = [[Esp]];
+G2L["8"]["Position"] = UDim2.new(0.664, 0, 0.21196, 0);
 
--- StarterGui.ScreenGui.Frame.HideGUI
-G2L["9"] = Instance.new("ImageButton", G2L["2"]);
-G2L["9"]["BorderSizePixel"] = 0;
-G2L["9"]["BackgroundColor3"] = Color3.fromRGB(55, 55, 55);
-G2L["9"]["Image"] = [[rbxassetid://6031094678]];
-G2L["9"]["Size"] = UDim2.new(0, 35, 0, 35);
-G2L["9"]["HoverImage"] = [[rbxassetid://6031094678]];
-G2L["9"]["Name"] = [[HideGUI]];
-G2L["9"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["9"]["Position"] = UDim2.new(0.46967, 0, 1.15388, 0);
+-- StarterGui.ScreenGui.Frame.ESPButton.UIStroke
+G2L["9"] = Instance.new("UIStroke", G2L["8"]);
+G2L["9"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border;
+G2L["9"]["Color"] = Color3.fromRGB(255, 255, 255);
 
--- StarterGui.ScreenGui.Frame.HideGUI.UICorner
-G2L["a"] = Instance.new("UICorner", G2L["9"]);
+-- StarterGui.ScreenGui.Frame.ESPButton.UICorner
+G2L["a"] = Instance.new("UICorner", G2L["8"]);
 
 
--- StarterGui.ScreenGui.Frame.HideGUI.UIStroke
-G2L["b"] = Instance.new("UIStroke", G2L["9"]);
-G2L["b"]["Color"] = Color3.fromRGB(255, 255, 255);
-
--- StarterGui.ScreenGui.Frame.hide
-G2L["c"] = Instance.new("LocalScript", G2L["2"]);
-G2L["c"]["Name"] = [[hide]];
-
--- StarterGui.ScreenGui.Frame.FlyButton
-G2L["d"] = Instance.new("TextButton", G2L["2"]);
-G2L["d"]["BorderSizePixel"] = 0;
-G2L["d"]["TextSize"] = 14;
-G2L["d"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["d"]["BackgroundColor3"] = Color3.fromRGB(55, 55, 55);
-G2L["d"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["d"]["Size"] = UDim2.new(0, 175, 0, 50);
-G2L["d"]["Name"] = [[FlyButton]];
-G2L["d"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["d"]["Text"] = [[Fly]];
-G2L["d"]["Position"] = UDim2.new(0.02667, 0, 0.04157, 0);
-
--- StarterGui.ScreenGui.Frame.FlyButton.UIStroke
-G2L["e"] = Instance.new("UIStroke", G2L["d"]);
-G2L["e"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border;
-G2L["e"]["Color"] = Color3.fromRGB(255, 255, 255);
-
--- StarterGui.ScreenGui.Frame.FlyButton.UICorner
-G2L["f"] = Instance.new("UICorner", G2L["d"]);
-
+-- StarterGui.ScreenGui.Frame.ESPButton.esp
+G2L["b"] = Instance.new("LocalScript", G2L["8"]);
+G2L["b"]["Name"] = [[esp]];
 
 -- StarterGui.ScreenGui.Frame.NoclipButton
+G2L["c"] = Instance.new("TextButton", G2L["2"]);
+G2L["c"]["BorderSizePixel"] = 0;
+G2L["c"]["TextSize"] = 14;
+G2L["c"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
+G2L["c"]["BackgroundColor3"] = Color3.fromRGB(55, 55, 55);
+G2L["c"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+G2L["c"]["Size"] = UDim2.new(0, 175, 0, 50);
+G2L["c"]["Name"] = [[NoclipButton]];
+G2L["c"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["c"]["Text"] = [[Noclip]];
+G2L["c"]["Position"] = UDim2.new(0.148, 0, 0.2962, 0);
+
+-- StarterGui.ScreenGui.Frame.NoclipButton.UIStroke
+G2L["d"] = Instance.new("UIStroke", G2L["c"]);
+G2L["d"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border;
+G2L["d"]["Color"] = Color3.fromRGB(255, 255, 255);
+
+-- StarterGui.ScreenGui.Frame.NoclipButton.UICorner
+G2L["e"] = Instance.new("UICorner", G2L["c"]);
+
+
+-- StarterGui.ScreenGui.Frame.NoclipButton.noclip
+G2L["f"] = Instance.new("LocalScript", G2L["c"]);
+G2L["f"]["Name"] = [[noclip]];
+
+-- StarterGui.ScreenGui.Frame.FlyButton
 G2L["10"] = Instance.new("TextButton", G2L["2"]);
 G2L["10"]["BorderSizePixel"] = 0;
 G2L["10"]["TextSize"] = 14;
@@ -110,161 +114,190 @@ G2L["10"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
 G2L["10"]["BackgroundColor3"] = Color3.fromRGB(55, 55, 55);
 G2L["10"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
 G2L["10"]["Size"] = UDim2.new(0, 175, 0, 50);
-G2L["10"]["Name"] = [[NoclipButton]];
+G2L["10"]["Name"] = [[FlyButton]];
 G2L["10"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["10"]["Text"] = [[Noclip]];
-G2L["10"]["Position"] = UDim2.new(0.35333, 0, 0.04958, 0);
+G2L["10"]["Text"] = [[Fly]];
+G2L["10"]["Position"] = UDim2.new(0, 0, 0.69907, 0);
 
--- StarterGui.ScreenGui.Frame.NoclipButton.UIStroke
+-- StarterGui.ScreenGui.Frame.FlyButton.UIStroke
 G2L["11"] = Instance.new("UIStroke", G2L["10"]);
 G2L["11"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border;
 G2L["11"]["Color"] = Color3.fromRGB(255, 255, 255);
 
--- StarterGui.ScreenGui.Frame.NoclipButton.UICorner
+-- StarterGui.ScreenGui.Frame.FlyButton.UICorner
 G2L["12"] = Instance.new("UICorner", G2L["10"]);
 
 
--- StarterGui.ScreenGui.Frame.ESPButton
-G2L["13"] = Instance.new("TextButton", G2L["2"]);
-G2L["13"]["BorderSizePixel"] = 0;
-G2L["13"]["TextSize"] = 14;
-G2L["13"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["13"]["BackgroundColor3"] = Color3.fromRGB(55, 55, 55);
-G2L["13"]["FontFace"] = Font.new([[rbxasset://fonts/families/SourceSansPro.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["13"]["Size"] = UDim2.new(0, 175, 0, 50);
-G2L["13"]["Name"] = [[ESPButton]];
-G2L["13"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["13"]["Text"] = [[Esp]];
-G2L["13"]["Position"] = UDim2.new(0.68167, 0, 0.04527, 0);
+-- StarterGui.ScreenGui.Frame.FlyButton.fly
+G2L["13"] = Instance.new("LocalScript", G2L["10"]);
+G2L["13"]["Name"] = [[fly]];
 
--- StarterGui.ScreenGui.Frame.ESPButton.UIStroke
-G2L["14"] = Instance.new("UIStroke", G2L["13"]);
-G2L["14"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border;
-G2L["14"]["Color"] = Color3.fromRGB(255, 255, 255);
-
--- StarterGui.ScreenGui.Frame.ESPButton.UICorner
-G2L["15"] = Instance.new("UICorner", G2L["13"]);
-
-
--- StarterGui.ScreenGui.Frame.fly
-G2L["16"] = Instance.new("LocalScript", G2L["2"]);
-G2L["16"]["Name"] = [[fly]];
-
--- StarterGui.ScreenGui.Frame.noclip
-G2L["17"] = Instance.new("LocalScript", G2L["2"]);
-G2L["17"]["Name"] = [[noclip]];
-
--- StarterGui.ScreenGui.Frame.esp
-G2L["18"] = Instance.new("LocalScript", G2L["2"]);
-G2L["18"]["Name"] = [[esp]];
+-- StarterGui.ScreenGui.Frame.UIListLayout
+G2L["14"] = Instance.new("UIListLayout", G2L["2"]);
+G2L["14"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Center;
+G2L["14"]["Padding"] = UDim.new(0, 10);
+G2L["14"]["VerticalAlignment"] = Enum.VerticalAlignment.Center;
 
 -- StarterGui.ScreenGui.Frame.glow
-G2L["19"] = Instance.new("LocalScript", G2L["2"]);
-G2L["19"]["Name"] = [[glow]];
+G2L["15"] = Instance.new("LocalScript", G2L["2"]);
+G2L["15"]["Name"] = [[glow]];
 
 -- StarterGui.ScreenGui.Frame.drag
-local function C_8()
-local script = G2L["8"];
-	local frame = script.Parent
-	local UserInputService = game:GetService("UserInputService")
+G2L["16"] = Instance.new("LocalScript", G2L["2"]);
+G2L["16"]["Name"] = [[drag]];
+
+-- StarterGui.ScreenGui.HideGUI
+G2L["17"] = Instance.new("ImageButton", G2L["1"]);
+G2L["17"]["BorderSizePixel"] = 0;
+G2L["17"]["BackgroundColor3"] = Color3.fromRGB(55, 55, 55);
+G2L["17"]["Image"] = [[http://www.roblox.com/asset/?id=7158102700]];
+G2L["17"]["Size"] = UDim2.new(0, 75, 0, 75);
+G2L["17"]["HoverImage"] = [[http://www.roblox.com/asset/?id=7158102700]];
+G2L["17"]["Name"] = [[HideGUI]];
+G2L["17"]["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+G2L["17"]["Position"] = UDim2.new(0.48945, 0, 0.02701, 0);
+
+-- StarterGui.ScreenGui.HideGUI.UICorner
+G2L["18"] = Instance.new("UICorner", G2L["17"]);
+
+
+-- StarterGui.ScreenGui.HideGUI.UIStroke
+G2L["19"] = Instance.new("UIStroke", G2L["17"]);
+G2L["19"]["Thickness"] = 2.5;
+G2L["19"]["Color"] = Color3.fromRGB(255, 255, 255);
+
+-- StarterGui.ScreenGui.HideGUI.hide
+G2L["1a"] = Instance.new("LocalScript", G2L["17"]);
+G2L["1a"]["Name"] = [[hide]];
+
+-- StarterGui.ScreenGui.HideGUI.glow
+G2L["1b"] = Instance.new("LocalScript", G2L["17"]);
+G2L["1b"]["Name"] = [[glow]];
+
+-- StarterGui.ScreenGui.HideGUI.drag
+G2L["1c"] = Instance.new("LocalScript", G2L["17"]);
+G2L["1c"]["Name"] = [[drag]];
+
+-- StarterGui.ScreenGui.Frame.ESPButton.esp
+local function C_b()
+local script = G2L["b"];
+	-- Get the ESPButton
+	local espButton = script.Parent
 	
-	local dragging
-	local dragInput
-	local dragStart
-	local startPos
+	-- Variables for ESP
+	local esp = false
 	
-	local function update(input)
-		local delta = input.Position - dragStart
-		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	-- Function to create ESP box
+	local function createESPBox(part)
+		local box = Instance.new("BoxHandleAdornment")
+		box.Size = part.Size + Vector3.new(0.1, 0.1, 0.1)
+		box.Adornee = part
+		box.Color3 = Color3.new(1, 0, 0)
+		box.Transparency = 0.5
+		box.ZIndex = 1
+		box.AlwaysOnTop = true
+		box.Parent = part
 	end
 	
-	frame.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = true
-			dragStart = input.Position
-			startPos = frame.Position
-	
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
+	-- Function to enable ESP
+	local function enableESP()
+		for _, v in pairs(workspace:GetDescendants()) do
+			if v:IsA("Model") and v:FindFirstChild("Humanoid") then
+				for _, p in pairs(v:GetChildren()) do
+					if p:IsA("BasePart") then
+						createESPBox(p)
+					end
 				end
-			end)
+			end
 		end
-	end)
-	
-	frame.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			dragInput = input
-		end
-	end)
-	
-	UserInputService.InputChanged:Connect(function(input)
-		if input == dragInput and dragging then
-			update(input)
-		end
-	end)
-end;
-task.spawn(C_8);
--- StarterGui.ScreenGui.Frame.hide
-local function C_c()
-local script = G2L["c"];
-	-- LocalScript inside ScreenGui
-	
-	-- Reference to the ScreenGui
-	local screenGui = script.Parent
-	
-	-- Reference to the ImageButton
-	local imageButton = screenGui:FindFirstChild("HideGUI")
-	
-	-- TweenService for smooth animation
-	local TweenService = game:GetService("TweenService")
-	
-	-- Set initial position to the center of the screen
-	screenGui.Position = UDim2.new(0.5, -screenGui.Size.X.Offset / 2, 0.5, -screenGui.Size.Y.Offset / 0.35)
-	
-	-- Function to move the ScreenGui off-screen
-	local function moveScreenGuiOffScreen()
-		local targetPosition = UDim2.new(0.5, -screenGui.Size.X.Offset / 2, -0.27, 0) -- Move off screen (up)
-		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		local tween = TweenService:Create(screenGui, tweenInfo, {Position = targetPosition})
-		tween:Play()
 	end
 	
-	-- Function to move the ScreenGui back on-screen
-	local function moveScreenGuiOnScreen()
-		local targetPosition = UDim2.new(0.5, -screenGui.Size.X.Offset / 2, 0.5, -screenGui.Size.Y.Offset / 0.35) -- Move back on screen
-		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		local tween = TweenService:Create(screenGui, tweenInfo, {Position = targetPosition})
-		tween:Play()
+	-- Function to disable ESP
+	local function disableESP()
+		for _, v in pairs(workspace:GetDescendants()) do
+			if v:IsA("BoxHandleAdornment") then
+				v:Destroy()
+			end
+		end
 	end
 	
-	-- Variable to track visibility state
-	local isVisible = true
-	
-	-- Function to handle button click
-	local function onButtonClick()
-		if isVisible then
-			moveScreenGuiOffScreen()
+	-- Toggle ESP on button click
+	espButton.MouseButton1Click:Connect(function()
+		esp = not esp
+		espButton.Text = esp and "Deactivate Esp" or "ESP"
+		if esp then
+			enableESP()
 		else
-			moveScreenGuiOnScreen()
+			disableESP()
 		end
-		isVisible = not isVisible
-	end
-	
-	-- Connect the button click event to the function
-	if imageButton then
-		imageButton.MouseButton1Click:Connect(onButtonClick)
-	end
+	end)
 	
 end;
-task.spawn(C_c);
--- StarterGui.ScreenGui.Frame.fly
-local function C_16()
-local script = G2L["16"];
+task.spawn(C_b);
+-- StarterGui.ScreenGui.Frame.NoclipButton.noclip
+local function C_f()
+local script = G2L["f"];
+	local RunService = game:GetService("RunService")
+	
+	-- Get the NoclipButton
+	local noclipButton = script.Parent
+	
+	
+	-- Variables for Noclip
+	local Clip = true
+	local Noclipping = nil
+	local nclipparts = {}
+	
+	-- Function to enable noclip
+	local function enableNoclip(speaker)
+		Clip = false
+		task.wait(0.1)  -- Short delay to ensure setup
+		local function NoclipLoop()
+			if not Clip and speaker.Character then
+				for _, child in pairs(speaker.Character:GetDescendants()) do
+					if child:IsA("BasePart") and child.CanCollide and child.Name ~= "Head" then
+						child.CanCollide = false
+						table.insert(nclipparts, child)
+					end
+				end
+			end
+		end
+		Noclipping = RunService.Stepped:Connect(NoclipLoop)
+	end
+	
+	-- Function to disable noclip
+	local function disableNoclip()
+		if Noclipping then
+			Noclipping:Disconnect()
+			for _, child in ipairs(nclipparts) do
+				child.CanCollide = true
+			end
+			nclipparts = {}
+		end
+		Clip = true
+	end
+	
+	-- Toggle noclip on button click
+	noclipButton.MouseButton1Click:Connect(function()
+		local speaker = game.Players.LocalPlayer
+		if Clip then
+			noclipButton.Text = "Deactivate noclip"
+			enableNoclip(speaker)
+		else
+			noclipButton.Text = "Noclip"
+			disableNoclip()
+		end
+	end)
+	
+end;
+task.spawn(C_f);
+-- StarterGui.ScreenGui.Frame.FlyButton.fly
+local function C_13()
+local script = G2L["13"];
 	local RunService = game:GetService("RunService")
 	
 	-- Get the FlyButton
-	local flyButton = script.Parent:WaitForChild("FlyButton")
+	local flyButton = script.Parent
 	
 	-- Variables for Flight
 	local flying = false
@@ -318,122 +351,10 @@ local script = G2L["16"];
 	end)
 	
 end;
-task.spawn(C_16);
--- StarterGui.ScreenGui.Frame.noclip
-local function C_17()
-local script = G2L["17"];
-	local RunService = game:GetService("RunService")
-	
-	-- Get the NoclipButton
-	local noclipButton = script.Parent:WaitForChild("NoclipButton")
-	
-	-- Variables for Noclip
-	local Clip = true
-	local Noclipping = nil
-	local nclipparts = {}
-	
-	-- Function to enable noclip
-	local function enableNoclip(speaker)
-		Clip = false
-		task.wait(0.1)  -- Short delay to ensure setup
-		local function NoclipLoop()
-			if not Clip and speaker.Character then
-				for _, child in pairs(speaker.Character:GetDescendants()) do
-					if child:IsA("BasePart") and child.CanCollide and child.Name ~= "Head" then
-						child.CanCollide = false
-						table.insert(nclipparts, child)
-					end
-				end
-			end
-		end
-		Noclipping = RunService.Stepped:Connect(NoclipLoop)
-	end
-	
-	-- Function to disable noclip
-	local function disableNoclip()
-		if Noclipping then
-			Noclipping:Disconnect()
-			for _, child in ipairs(nclipparts) do
-				child.CanCollide = true
-			end
-			nclipparts = {}
-		end
-		Clip = true
-	end
-	
-	-- Toggle noclip on button click
-	noclipButton.MouseButton1Click:Connect(function()
-		local speaker = game.Players.LocalPlayer
-		if Clip then
-			noclipButton.Text = "Deactivate noclip"
-			enableNoclip(speaker)
-		else
-			noclipButton.Text = "Noclip"
-			disableNoclip()
-		end
-	end)
-	
-end;
-task.spawn(C_17);
--- StarterGui.ScreenGui.Frame.esp
-local function C_18()
-local script = G2L["18"];
-	-- Get the ESPButton
-	local espButton = script.Parent:WaitForChild("ESPButton")
-	
-	-- Variables for ESP
-	local esp = false
-	
-	-- Function to create ESP box
-	local function createESPBox(part)
-		local box = Instance.new("BoxHandleAdornment")
-		box.Size = part.Size + Vector3.new(0.1, 0.1, 0.1)
-		box.Adornee = part
-		box.Color3 = Color3.new(1, 0, 0)
-		box.Transparency = 0.5
-		box.ZIndex = 1
-		box.AlwaysOnTop = true
-		box.Parent = part
-	end
-	
-	-- Function to enable ESP
-	local function enableESP()
-		for _, v in pairs(workspace:GetDescendants()) do
-			if v:IsA("Model") and v:FindFirstChild("Humanoid") then
-				for _, p in pairs(v:GetChildren()) do
-					if p:IsA("BasePart") then
-						createESPBox(p)
-					end
-				end
-			end
-		end
-	end
-	
-	-- Function to disable ESP
-	local function disableESP()
-		for _, v in pairs(workspace:GetDescendants()) do
-			if v:IsA("BoxHandleAdornment") then
-				v:Destroy()
-			end
-		end
-	end
-	
-	-- Toggle ESP on button click
-	espButton.MouseButton1Click:Connect(function()
-		esp = not esp
-		espButton.Text = esp and "Deactivate Esp" or "ESP"
-		if esp then
-			enableESP()
-		else
-			disableESP()
-		end
-	end)
-	
-end;
-task.spawn(C_18);
+task.spawn(C_13);
 -- StarterGui.ScreenGui.Frame.glow
-local function C_19()
-local script = G2L["19"];
+local function C_15()
+local script = G2L["15"];
 	-- LocalScript to make UI border glow with smooth color transitions
 	
 	local TweenService = game:GetService("TweenService")
@@ -469,6 +390,246 @@ local script = G2L["19"];
 	end
 	
 end;
-task.spawn(C_19);
+task.spawn(C_15);
+-- StarterGui.ScreenGui.Frame.drag
+local function C_16()
+local script = G2L["16"];
+	local frame = script.Parent
+	local UserInputService = game:GetService("UserInputService")
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	frame.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end;
+task.spawn(C_16);
+-- StarterGui.ScreenGui.HideGUI.hide
+local function C_1a()
+local script = G2L["1a"];
+	-- LocalScript inside ScreenGui
+	
+	-- Reference to the Frame inside the ScreenGui
+	local frame = script.Parent.Parent.Frame
+	
+	-- Reference to the ImageButton
+	local imageButton = script.Parent
+	
+	-- TweenService for smooth animation
+	local TweenService = game:GetService("TweenService")
+	
+	-- Function to ensure the Frame is fully visible and adjust its size if necessary
+	local function adjustFrameToFit()
+		local screenSize = workspace.CurrentCamera.ViewportSize
+		local frameSize = frame.Size
+		local framePosition = frame.Position
+	
+		-- Calculate the maximum allowable size for the Frame
+		local maxWidth = screenSize.X - framePosition.X.Offset
+		local maxHeight = screenSize.Y - framePosition.Y.Offset
+	
+		-- Determine if the Frame fits within the screen
+		if frameSize.X.Offset > maxWidth or frameSize.Y.Offset > maxHeight then
+			-- Calculate scaling factors
+			local widthScale = maxWidth / frameSize.X.Offset
+			local heightScale = maxHeight / frameSize.Y.Offset
+			local scale = math.min(widthScale, heightScale) -- Use the smaller scaling factor to ensure the Frame fits
+	
+			-- Adjust the Frame size while maintaining the aspect ratio
+			frame.Size = UDim2.new(frame.Size.X.Scale * scale, 0, frame.Size.Y.Scale * scale, 0)
+		end
+	
+		-- Ensure the Frame is within the viewable area
+		frame.Position = UDim2.new(frame.Position.X.Scale, math.min(frame.Position.X.Offset, screenSize.X - frame.Size.X.Offset), 
+			frame.Position.Y.Scale, math.min(frame.Position.Y.Offset, screenSize.Y - frame.Size.Y.Offset))
+	end
+	
+	-- Ensure the Frame fits within the viewable area initially
+	adjustFrameToFit()
+	
+	-- Function to move the Frame off-screen to the left
+	local function moveFrameOffScreen(callback)
+		local screenSize = workspace.CurrentCamera.ViewportSize
+		local targetPosition = UDim2.new(-frame.Size.X.Scale - frame.Size.X.Offset / screenSize.X, 0, frame.Position.Y.Scale, frame.Position.Y.Offset)
+		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		local tween = TweenService:Create(frame, tweenInfo, {Position = targetPosition})
+	
+		-- Play the tween animation
+		tween:Play()
+	
+		-- Wait for the tween to complete
+		tween.Completed:Connect(function()
+			-- Execute callback function after tween completes
+			if callback then
+				callback()
+			end
+		end)
+	end
+	
+	-- Function to move the Frame back on-screen
+	local function moveFrameOnScreen(callback)
+		local initialPosition = UDim2.new(0.02, 0, 0.312, 0) -- Initial position
+		local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		local tween = TweenService:Create(frame, tweenInfo, {Position = initialPosition})
+	
+		-- Play the tween animation
+		tween:Play()
+	
+		-- Wait for the tween to complete
+		tween.Completed:Connect(function()
+			-- Execute callback function after tween completes
+			if callback then
+				callback()
+			end
+		end)
+	end
+	
+	-- Function to hide the Frame completely
+	local function hideFrame()
+		-- Move the frame off-screen and hide it after animation completes
+		moveFrameOffScreen(function()
+			frame.Visible = false
+		end)
+	end
+	
+	-- Function to show the Frame
+	local function showFrame()
+		-- Make the frame visible and move it on-screen
+		frame.Visible = true
+		moveFrameOnScreen()
+	end
+	
+	-- Variable to track visibility state
+	local isVisible = true
+	
+	-- Function to handle button click
+	local function onButtonClick()
+		if isVisible then
+			hideFrame()
+		else
+			showFrame()
+		end
+		isVisible = not isVisible
+	end
+	
+	-- Connect the button click event to the function
+	if imageButton then
+		imageButton.MouseButton1Click:Connect(onButtonClick)
+	end
+	
+end;
+task.spawn(C_1a);
+-- StarterGui.ScreenGui.HideGUI.glow
+local function C_1b()
+local script = G2L["1b"];
+	-- LocalScript to make UI border glow with smooth color transitions
+	
+	local TweenService = game:GetService("TweenService")
+	local uiStroke = script.Parent:FindFirstChildOfClass("UIStroke") -- Find the UIStroke
+	
+	if not uiStroke then
+		warn("UIStroke not found!")
+		return
+	end
+	
+	-- Function to create a tween for the UIStroke color change
+	local function createColorTween(uiStroke, targetColor, duration)
+		local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 0, false, 0)
+		local tweenGoal = {Color = targetColor}
+		local tween = TweenService:Create(uiStroke, tweenInfo, tweenGoal)
+		return tween
+	end
+	
+	-- Function to get a random color
+	local function getRandomColor()
+		return Color3.new(math.random(), math.random(), math.random())
+	end
+	
+	-- Variables
+	local transitionDuration = 2 -- Duration of each color transition
+	
+	-- Main loop for color transitions
+	while true do
+		local targetColor = getRandomColor()
+		local tween = createColorTween(uiStroke, targetColor, transitionDuration)
+		tween:Play()
+		tween.Completed:Wait() -- Wait for the tween to complete before starting a new one
+	end
+	
+end;
+task.spawn(C_1b);
+-- StarterGui.ScreenGui.HideGUI.drag
+local function C_1c()
+local script = G2L["1c"];
+	local frame = script.Parent
+	local UserInputService = game:GetService("UserInputService")
+	
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	
+	local function update(input)
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+	
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	
+	frame.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end;
+task.spawn(C_1c);
 
 return G2L["1"], require;
