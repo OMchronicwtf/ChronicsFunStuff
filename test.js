@@ -1,5 +1,5 @@
 // ==SE_module==
-// name: random_joke
+// name: random_joke_generator
 // displayName: Random Joke Generator
 // description: A Script That Provides Random Jokes to Users
 // version: 1.0
