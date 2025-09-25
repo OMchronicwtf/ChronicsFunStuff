@@ -1,0 +1,144 @@
+return function(Rayfield, Window)
+    -- Create Quests tab
+    local Tab = Window:CreateTab("Quests", 4483362458)
+
+    -- Table of quests (editable!) with DisplayName for dropdown/notifications
+    local quests = {
+        {MinLevel = 1, QuestName = "The Start", DisplayName = "Level 1 → The Start"},
+        {MinLevel = 10, QuestName = "Quest 1", DisplayName = "Level 10 → Quest 1"},
+        {MinLevel = 20, QuestName = "Quest 2", DisplayName = "Level 20 → Quest 2"},
+        {MinLevel = 35, QuestName = "Quest 3", DisplayName = "Level 35 → Quest 3"},
+        {MinLevel = 50, QuestName = "Quest 4", DisplayName = "Level 50 → Quest 4"},
+        {MinLevel = 75, QuestName = "Quest 5", DisplayName = "Level 75 → Quest 5"},
+        {MinLevel = 100, QuestName = "Quest 6", DisplayName = "Level 100 → Quest 6"},
+        {MinLevel = 125, QuestName = "Quest 7", DisplayName = "Level 125 → Quest 7"},
+        {MinLevel = 150, QuestName = "Quest 8", DisplayName = "Level 150 → Quest 8"},
+        {MinLevel = 200, QuestName = "Quest 9", DisplayName = "Level 200 → Quest 9"},
+        {MinLevel = 250, QuestName = "Quest 10", DisplayName = "Level 250 → Quest 10"},
+        {MinLevel = 300, QuestName = "Quest 11", DisplayName = "Level 300 → Quest 11"},
+        {MinLevel = 350, QuestName = "Quest 12", DisplayName = "Level 350 → Quest 12"},
+        {MinLevel = 400, QuestName = "Quest 13", DisplayName = "Level 400 → Quest 13"},
+        {MinLevel = 450, QuestName = "Quest 14", DisplayName = "Level 450 → Quest 14"},
+        {MinLevel = 500, QuestName = "Quest 15", DisplayName = "Level 500 → Quest 15"},
+        {MinLevel = 550, QuestName = "Quest 16", DisplayName = "Level 550 → Quest 16"},
+        {MinLevel = 600, QuestName = "Quest 17", DisplayName = "Level 600 → Quest 17"},
+        {MinLevel = 650, QuestName = "Quest 18", DisplayName = "Level 650 → Quest 18"},
+        {MinLevel = 700, QuestName = "Quest 19", DisplayName = "Level 700 → Quest 19"},
+        {MinLevel = 750, QuestName = "Quest 20", DisplayName = "Level 750 → Quest 20"},
+        {MinLevel = 800, QuestName = "Quest 21", DisplayName = "Level 800 → Quest 21"},
+    }
+
+    local player = game:GetService("Players").LocalPlayer
+    local Event = game:GetService("ReplicatedStorage").Resource.Remotes.Bindable.Compliments
+
+    -- Helper function to start a quest
+    local function StartQuest(selectedQuest)
+        Event:FireServer({Type = "RemoveQuest"})
+        Event:FireServer({Quest = selectedQuest.QuestName, Type = "RepeatQuest"})
+    end
+
+    -- ===========================
+    -- Toggle: Auto Quest
+    -- ===========================
+    Tab:CreateToggle({
+        Name = "Auto Quest",
+        CurrentValue = false,
+        Flag = "AutoQuestToggle",
+        Callback = function(state)
+            local RunService = game:GetService("RunService")
+            local function CheckAndStartQuest()
+                local level = player:WaitForChild("Data"):WaitForChild("Level").Value
+                local selectedQuest
+                for _, quest in ipairs(quests) do
+                    if level >= quest.MinLevel then
+                        selectedQuest = quest
+                    end
+                end
+                return selectedQuest
+            end
+
+            if state == false and _G.autoQuestConnection then
+                _G.autoQuestConnection:Disconnect()
+                _G.autoQuestConnection = nil
+                Event:FireServer({Type = "RemoveQuest"})
+            end
+
+            if state == true then
+                _G.autoQuestConnection = RunService.Heartbeat:Connect(function()
+                    local questGui = player:WaitForChild("PlayerGui"):WaitForChild("Quest"):WaitForChild("Mission")
+                    if not questGui.Visible then
+                        local questToStart = CheckAndStartQuest()
+                        if questToStart then
+                            Event:FireServer({Type = "RemoveQuest"})
+                            Event:FireServer({Quest = questToStart.QuestName, Type = "RepeatQuest"})
+                        end
+                    end
+                end)
+            end
+        end
+    })
+
+    -- ===========================
+    -- Button: Start based on current level
+    -- ===========================
+    Tab:CreateButton({
+        Name = "Start Current Quest",
+        Callback = function()
+            local level = player:WaitForChild("Data"):WaitForChild("Level").Value
+            local selectedQuest
+            for _, quest in ipairs(quests) do
+                if level >= quest.MinLevel then
+                    selectedQuest = quest
+                end
+            end
+            if selectedQuest then
+                StartQuest(selectedQuest)
+            end
+        end
+    })
+
+    -- ===========================
+    -- Dropdown & manual start
+    -- ===========================
+    local selectedQuestManual = {}
+    local function RefreshDropdownOptions()
+        local questOptions = {}
+        for _, quest in ipairs(quests) do
+            table.insert(questOptions, quest.DisplayName)
+        end
+        if #questOptions > 0 then
+            selectedQuestManual = {questOptions[1]}
+        end
+        return questOptions
+    end
+
+    local dropdownOptions = RefreshDropdownOptions()
+
+    Tab:CreateDropdown({
+        Name = "Select Quest",
+        Options = dropdownOptions,
+        CurrentOption = selectedQuestManual,
+        MultipleOptions = false,
+        Flag = "ManualQuestDropdown",
+        Callback = function(options)
+            selectedQuestManual = options
+        end
+    })
+
+    Tab:CreateButton({
+        Name = "Start Selected Quest",
+        Callback = function()
+            local questName = selectedQuestManual[1]
+            local questToStart
+            for _, quest in ipairs(quests) do
+                if quest.DisplayName == questName then
+                    questToStart = quest
+                    break
+                end
+            end
+            if questToStart then
+                StartQuest(questToStart)
+            end
+        end
+    })
+end
